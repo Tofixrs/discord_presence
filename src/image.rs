@@ -15,12 +15,12 @@ impl Image {
             });
             ui.horizontal(|ui| {
                 ui.label("Label");
-                ui.text_edit_singleline(&mut self.key)
+                ui.text_edit_singleline(&mut self.text)
             });
             ui.horizontal(|ui| {
                 ui.label("Key");
-                ui.add_space(7.);
-                ui.text_edit_singleline(&mut self.text)
+                ui.add_space(9.);
+                ui.text_edit_singleline(&mut self.key)
             })
         });
     }
