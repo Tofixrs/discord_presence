@@ -11,7 +11,7 @@ use timestamp::TimestampEnum;
 use discord_rich_presence::activity::{Activity, Assets, Button, Timestamps};
 use discord_rich_presence::{DiscordIpc, DiscordIpcClient};
 
-use chrono::{DateTime, Datelike, Local, TimeZone, Utc};
+use chrono::{DateTime, Local, Utc};
 use eframe::egui::{self, Layout, Vec2};
 use eframe::emath::Align;
 use eframe::{run_native, NativeOptions};
