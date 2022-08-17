@@ -4,8 +4,10 @@ use eframe::{
     emath::Align,
 };
 use egui_datepicker::DatePicker;
+use serde::{Deserialize, Serialize};
 
-#[derive(PartialEq)]
+//stfu rust analyzer this code compiles
+#[derive(PartialEq, Serialize, Deserialize, Clone, Copy)]
 pub enum TimestampEnum {
     None,
     SinceStart,
