@@ -374,7 +374,7 @@ impl App {
     }
     fn load_preset(&mut self) {
         if self.menu_bar.loaded_preset.is_some() {
-            let preset = self.menu_bar.loaded_preset.as_ref().unwrap();
+            let preset = self.menu_bar.loaded_preset.unwrap();
             if preset.ID.is_some() {
                 self.id = preset.ID.unwrap().to_string();
             }
