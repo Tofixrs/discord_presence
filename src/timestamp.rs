@@ -3,12 +3,13 @@ use eframe::{
     egui::{Layout, Ui},
     emath::Align,
 };
-use egui_datepicker::DatePicker;
+// use egui_datepicker::DatePicker;
 use serde::{Deserialize, Serialize};
 
 //stfu rust analyzer this code compiles
-#[derive(PartialEq, Serialize, Deserialize, Clone, Copy)]
+#[derive(PartialEq, Serialize, Deserialize, Clone, Copy, Default)]
 pub enum TimestampEnum {
+    #[default]
     None,
     SinceStart,
     SinceLastUpdate,
@@ -18,6 +19,15 @@ pub enum TimestampEnum {
 pub struct Timestamp {
     pub timestamp: TimestampEnum,
     pub date: Date<Utc>,
+}
+
+impl Default for Timestamp {
+    fn default() -> Self {
+        Self {
+            timestamp: TimestampEnum::default(),
+            date: Utc::now().date(),
+        }
+    }
 }
 
 impl Timestamp {
@@ -45,13 +55,13 @@ impl Timestamp {
                 "Your local time",
             );
             ui.add_space(5.);
-            ui.radio_value(
-                &mut self.timestamp,
-                TimestampEnum::CustomTimeStamp,
-                "Custom timestamp",
-            );
+            // ui.radio_value(
+            //     &mut self.timestamp,
+            //     TimestampEnum::CustomTimeStamp,
+            //     "Custom timestamp",
+            // );
             ui.add_space(5.);
-            ui.add(DatePicker::new("datepicker-unique-id", &mut self.date));
+            // ui.add(DatePicker::new("datepicker-unique-id", &mut self.date).movable(true));
             ui.add_space(5.);
         });
     }

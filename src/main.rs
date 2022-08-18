@@ -3,39 +3,36 @@
 mod image;
 mod menu_bar;
 mod presence_button;
+mod preset;
+mod storage;
 mod timestamp;
+
+use storage::Storage;
+use timestamp::{Timestamp, TimestampEnum};
+
 use std::time::Duration;
 use std::vec;
 
-use serde::{Deserialize, Serialize};
 use serde_json::{from_str, to_string};
-use timestamp::TimestampEnum;
 
 use discord_rich_presence::activity::{Activity, Assets, Button, Party, Timestamps};
 use discord_rich_presence::{DiscordIpc, DiscordIpcClient};
 
 use chrono::{DateTime, Local, Utc};
+
 use eframe::egui::{self, Layout, Vec2};
 use eframe::emath::Align;
 use eframe::{run_native, NativeOptions};
 
 fn main() {
     let options = NativeOptions {
-        always_on_top: false,
-        maximized: false,
         decorated: true,
         drag_and_drop_support: true,
         icon_data: None,
-        initial_window_pos: None,
         initial_window_size: Some(Vec2::new(600.0, 650.0)),
-        min_window_size: None,
-        max_window_size: None,
         resizable: false,
-        transparent: false,
         vsync: true,
-        multisampling: 0,
-        depth_buffer: 0,
-        stencil_buffer: 0,
+        ..Default::default()
     };
     run_native(
         "Discord Presence",
@@ -43,7 +40,6 @@ fn main() {
         Box::new(|cc| Box::new(App::new(cc))),
     );
 }
-
 struct App {
     menu_bar: menu_bar::MenuBar,
     first_btn: presence_button::PresenceButton,
@@ -65,37 +61,17 @@ struct App {
 impl Default for App {
     fn default() -> Self {
         Self {
-            menu_bar: menu_bar::MenuBar {
-                run_on_startup: true,
-                start_minimized: true,
-                autoconnect: true,
-                check_updates: true,
-            },
-            first_btn: presence_button::PresenceButton {
-                label: "".to_string(),
-                url: "".to_string(),
-            },
-            second_btn: presence_button::PresenceButton {
-                label: "".to_string(),
-                url: "".to_string(),
-            },
-            first_img: image::Image {
-                key: "".to_string(),
-                text: "".to_string(),
-            },
-            second_img: image::Image {
-                key: "".to_string(),
-                text: "".to_string(),
-            },
-            id: "".to_string(),
-            details: "".to_string(),
+            menu_bar: menu_bar::MenuBar::default(),
+            first_btn: presence_button::PresenceButton::default(),
+            second_btn: presence_button::PresenceButton::default(),
+            first_img: image::Image::default(),
+            second_img: image::Image::default(),
+            id: String::new(),
+            details: String::new(),
             party: 0,
             party_of: 0,
-            state: "".to_string(),
-            timestamp: timestamp::Timestamp {
-                timestamp: timestamp::TimestampEnum::None,
-                date: Utc::now().date(),
-            },
+            state: String::new(),
+            timestamp: Timestamp::default(),
             client: DiscordIpcClient::new("0").unwrap(),
             connected: false,
             started: Utc::now(),
@@ -106,7 +82,6 @@ impl Default for App {
 
 impl App {
     fn new(cc: &eframe::CreationContext<'_>) -> Self {
-        cc.egui_ctx.set_visuals(egui::Visuals::dark());
         let storage = match cc.storage.unwrap().get_string("settings") {
             None => "".to_string(),
             Some(value) => value,
@@ -115,7 +90,16 @@ impl App {
             Ok(storage) => storage,
             Err(_) => Storage::default(),
         };
-        App {
+        match storage.darkmode {
+            true => cc.egui_ctx.set_visuals(egui::Visuals::dark()),
+            false => cc.egui_ctx.set_visuals(egui::Visuals::light()),
+        }
+        let mut client = DiscordIpcClient::new(&storage.id)
+            .expect("Failed to create client while loading storage");
+        if storage.autoconnect {
+            client.connect().expect("Failed to autoconnect on startup");
+        }
+        let mut app = App {
             id: storage.id,
             details: storage.details,
             state: storage.state,
@@ -141,88 +125,26 @@ impl App {
                 key: storage.small_image_key,
                 text: storage.small_image_label,
             },
+            menu_bar: menu_bar::MenuBar {
+                autoconnect: storage.autoconnect,
+                darkmode: storage.darkmode,
+                ..Default::default()
+            },
+            client,
             ..Default::default()
+        };
+        if storage.autoconnect {
+            app.set_presence();
+            app.connected = true;
         }
-    }
-}
-
-//rust analyzer fuck off it compiles correctly
-#[derive(Serialize, Deserialize)]
-struct Storage {
-    id: String,
-    details: String,
-    state: String,
-    party: u8,
-    party_of: u8,
-    timestamp: TimestampEnum,
-    large_image_key: String,
-    small_image_key: String,
-    large_image_label: String,
-    small_image_label: String,
-    first_btn_label: String,
-    second_btn_label: String,
-    first_btn_url: String,
-    second_btn_url: String,
-}
-
-impl Storage {
-    fn new(
-        id: &str,
-        details: &str,
-        state: &str,
-        party: u8,
-        party_of: u8,
-        timestamp: TimestampEnum,
-        large_image_key: &str,
-        small_image_key: &str,
-        large_image_label: &str,
-        small_image_label: &str,
-        first_btn_label: &str,
-        second_btn_label: &str,
-        first_btn_url: &str,
-        second_btn_url: &str,
-    ) -> Self {
-        Storage {
-            id: id.to_string(),
-            details: details.to_string(),
-            state: state.to_string(),
-            party,
-            party_of,
-            timestamp,
-            large_image_key: large_image_key.to_string(),
-            small_image_key: small_image_key.to_string(),
-            large_image_label: large_image_label.to_string(),
-            small_image_label: small_image_label.to_string(),
-            first_btn_label: first_btn_label.to_string(),
-            second_btn_label: second_btn_label.to_string(),
-            first_btn_url: first_btn_url.to_string(),
-            second_btn_url: second_btn_url.to_string(),
-        }
-    }
-}
-
-impl Default for Storage {
-    fn default() -> Self {
-        Storage {
-            id: "".to_string(),
-            details: "".to_string(),
-            state: "".to_string(),
-            party: 0,
-            party_of: 0,
-            timestamp: TimestampEnum::None,
-            large_image_key: "".to_string(),
-            small_image_key: "".to_string(),
-            large_image_label: "".to_string(),
-            small_image_label: "".to_string(),
-            first_btn_label: "".to_string(),
-            second_btn_label: "".to_string(),
-            first_btn_url: "".to_string(),
-            second_btn_url: "".to_string(),
-        }
+        app
     }
 }
 
 impl eframe::App for App {
+    fn persist_native_window(&self) -> bool {
+        false
+    }
     fn save(&mut self, storage: &mut dyn eframe::Storage) {
         let save = Storage::new(
             &self.id,
@@ -239,6 +161,8 @@ impl eframe::App for App {
             &self.second_btn.label,
             &self.first_btn.url,
             &self.second_btn.url,
+            self.menu_bar.autoconnect,
+            self.menu_bar.darkmode,
         );
         storage.set_string(
             "settings",
@@ -247,9 +171,6 @@ impl eframe::App for App {
     }
     fn auto_save_interval(&self) -> std::time::Duration {
         Duration::from_secs(5)
-    }
-    fn persist_egui_memory(&self) -> bool {
-        true
     }
     fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
         self.menu_bar.run(ctx);
@@ -268,7 +189,7 @@ impl eframe::App for App {
                 {
                     if self.id != "".to_string() {
                         self.client = DiscordIpcClient::new(&self.id).expect("sus");
-                        self.client.connect().expect("Failed to connect");
+                        self.client.connect().expect("Failed to connect to discord");
                         self.last_update = Utc::now();
                         self.set_presence();
                         self.connected = true;
@@ -326,10 +247,29 @@ impl eframe::App for App {
                 }
             });
         });
+        egui::containers::Window::new("About")
+            .open(&mut self.menu_bar.about_me)
+            .resizable(false)
+            .fixed_size(Vec2::new(200., 100.))
+            .show(ctx, |ui| {
+                ui.with_layout(Layout::top_down(Align::Center), |ui| {
+                    ui.heading("Discord Presence");
+                    ui.label("Version v0.2-beta");
+                });
+            });
+        self.load_preset()
     }
 }
 impl App {
     fn set_presence(&mut self) {
+        if self.id != self.client.client_id {
+            self.client
+                .close()
+                .expect("Failed to disconnect while updating application");
+            self.client = DiscordIpcClient::new(&self.id)
+                .expect("Failed to create client while updating application id");
+            self.client.connect().expect("Failed to connect to discord");
+        }
         let first_btn = Button::new(&self.first_btn.label, &self.first_btn.url);
         let second_btn = Button::new(&self.second_btn.label, &self.second_btn.url);
         let mut buttons = vec![];
@@ -407,12 +347,58 @@ impl App {
         };
 
         let part_exists = self.party != 0;
-        let activity = match part_exists {
+        let activity = match part_exists && self.state != "" {
             true => activity.party(Party::new().size([self.party_of as i32, self.party as i32])),
             false => activity,
         };
         self.client
             .set_activity(activity)
             .expect("Failed to set activity");
+    }
+    fn load_preset(&mut self) {
+        if self.menu_bar.loaded_preset != None {
+            let preset = self.menu_bar.loaded_preset.as_ref().unwrap();
+            if preset.ID != None {
+                self.id = preset.ID.as_ref().unwrap().to_string();
+            }
+            if preset.Details != None {
+                self.details = preset.Details.as_ref().unwrap().to_string();
+            }
+            if preset.State != None {
+                self.state = preset.State.as_ref().unwrap().to_string();
+            }
+            if preset.PartySize != None {
+                self.party = preset.PartySize.unwrap();
+            }
+            if preset.PartyMax != None {
+                self.party_of = preset.PartyMax.unwrap();
+            }
+            self.timestamp.timestamp = preset.timestamp();
+            if preset.LargeKey != None {
+                self.first_img.key = preset.LargeKey.as_ref().unwrap().to_string()
+            }
+            if preset.LargeText != None {
+                self.first_img.text = preset.LargeText.as_ref().unwrap().to_string()
+            }
+            if preset.SmallKey != None {
+                self.second_img.key = preset.SmallKey.as_ref().unwrap().to_string()
+            }
+            if preset.SmallText != None {
+                self.second_img.text = preset.SmallText.as_ref().unwrap().to_string()
+            }
+            if preset.Button1Text != None {
+                self.first_btn.label = preset.Button1Text.as_ref().unwrap().to_string()
+            }
+            if preset.Button1URL != None {
+                self.first_btn.url = preset.Button1URL.as_ref().unwrap().to_string()
+            }
+            if preset.Button2Text != None {
+                self.second_btn.label = preset.Button2Text.as_ref().unwrap().to_string()
+            }
+            if preset.Button2URL != None {
+                self.second_btn.url = preset.Button2URL.as_ref().unwrap().to_string()
+            }
+            self.menu_bar.loaded_preset = None
+        }
     }
 }

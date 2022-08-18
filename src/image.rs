@@ -1,5 +1,6 @@
 use eframe::egui::Ui;
 
+#[derive(Default)]
 pub struct Image {
     pub key: String,
     pub text: String,

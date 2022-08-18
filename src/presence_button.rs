@@ -1,5 +1,6 @@
 use eframe::egui::Ui;
 
+#[derive(Default)]
 pub struct PresenceButton {
     pub label: String,
     pub url: String,
