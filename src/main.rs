@@ -146,24 +146,42 @@ impl eframe::App for App {
         false
     }
     fn save(&mut self, storage: &mut dyn eframe::Storage) {
-        let save = Storage::new(
-            &self.id,
-            &self.details,
-            &self.state,
-            self.party,
-            self.party_of,
-            self.timestamp.timestamp,
-            &self.first_img.key,
-            &self.second_img.key,
-            &self.first_img.text,
-            &self.second_img.text,
-            &self.first_btn.label,
-            &self.second_btn.label,
-            &self.first_btn.url,
-            &self.second_btn.url,
-            self.menu_bar.autoconnect,
-            self.menu_bar.darkmode,
-        );
+        // let save = Storage::new(
+        //     &self.id,
+        //     &self.details,
+        //     &self.state,
+        //     self.party,
+        //     self.party_of,
+        //     self.timestamp.timestamp,
+        //     &self.first_img.key,
+        //     &self.second_img.key,
+        //     &self.first_img.text,
+        //     &self.second_img.text,
+        //     &self.first_btn.label,
+        //     &self.second_btn.label,
+        //     &self.first_btn.url,
+        //     &self.second_btn.url,
+        //     self.menu_bar.autoconnect,
+        //     self.menu_bar.darkmode,
+        // );
+        let save = Storage {
+            id: self.id.as_str().to_string(),
+            details: self.details.as_str().to_string(),
+            state: self.state.as_str().to_string(),
+            party: self.party,
+            party_of: self.party_of,
+            timestamp: self.timestamp.timestamp,
+            large_image_key: self.first_img.key.as_str().to_string(),
+            small_image_key: self.second_img.key.as_str().to_string(),
+            large_image_label: self.first_img.text.as_str().to_string(),
+            small_image_label: self.second_img.text.as_str().to_string(),
+            first_btn_label: self.first_btn.label.as_str().to_string(),
+            second_btn_label: self.second_btn.label.as_str().to_string(),
+            first_btn_url: self.first_btn.url.as_str().to_string(),
+            second_btn_url: self.second_btn.url.as_str().to_string(),
+            autoconnect: self.menu_bar.autoconnect,
+            darkmode: self.menu_bar.darkmode,
+        };
         storage.set_string(
             "settings",
             to_string(&save).expect("Failed to parse save struct"),
@@ -186,14 +204,13 @@ impl eframe::App for App {
                 if ui
                     .add_enabled(!self.connected, egui::Button::new("Connect"))
                     .clicked()
+                    && !self.id.is_empty()
                 {
-                    if self.id != "".to_string() {
-                        self.client = DiscordIpcClient::new(&self.id).expect("sus");
-                        self.client.connect().expect("Failed to connect to discord");
-                        self.last_update = Utc::now();
-                        self.set_presence();
-                        self.connected = true;
-                    }
+                    self.client = DiscordIpcClient::new(&self.id).expect("sus");
+                    self.client.connect().expect("Failed to connect to discord");
+                    self.last_update = Utc::now();
+                    self.set_presence();
+                    self.connected = true;
                 }
                 ui.add_space(10.);
                 if ui
@@ -329,25 +346,25 @@ impl App {
             "" => activity,
             _ => activity.state(&self.state),
         };
-        let first_btn_label_exists = self.first_btn.label != "".to_string();
-        let first_btn_url_exists = self.first_btn.url != "".to_string();
+        let first_btn_label_exists = !self.first_btn.label.is_empty();
+        let first_btn_url_exists = !self.first_btn.url.is_empty();
         if first_btn_label_exists && first_btn_url_exists {
             buttons.push(first_btn);
         }
 
-        let second_btn_label_exists = self.second_btn.label != "".to_string();
-        let second_btn_url_exists = self.second_btn.url != "".to_string();
+        let second_btn_label_exists = !self.second_btn.label.is_empty();
+        let second_btn_url_exists = !self.second_btn.url.is_empty();
         if second_btn_label_exists && second_btn_url_exists {
             buttons.push(second_btn);
         }
 
-        let activity = match buttons.len() > 0 {
+        let activity = match buttons.is_empty() {
             true => activity.buttons(buttons),
             false => activity,
         };
 
         let part_exists = self.party != 0;
-        let activity = match part_exists && self.state != "" {
+        let activity = match part_exists && self.state.is_empty() {
             true => activity.party(Party::new().size([self.party_of as i32, self.party as i32])),
             false => activity,
         };

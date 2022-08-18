@@ -7,7 +7,7 @@ use eframe::{
 use serde::{Deserialize, Serialize};
 
 //stfu rust analyzer this code compiles
-#[derive(PartialEq, Serialize, Deserialize, Clone, Copy, Default)]
+#[derive(PartialEq, Eq, Serialize, Deserialize, Clone, Copy, Default)]
 pub enum TimestampEnum {
     #[default]
     None,

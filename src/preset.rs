@@ -3,7 +3,7 @@
 use crate::TimestampEnum;
 use serde::{Deserialize, Serialize};
 
-#[derive(Serialize, Deserialize, Debug, PartialEq)]
+#[derive(Serialize, Deserialize, Debug, PartialEq, Eq)]
 pub struct Preset {
     pub ID: Option<String>,
     pub Details: Option<String>,
