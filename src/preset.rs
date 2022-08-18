@@ -4,25 +4,25 @@ use crate::TimestampEnum;
 use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, PartialEq, Eq)]
-pub struct Preset {
-    pub ID: Option<String>,
-    pub Details: Option<String>,
-    pub State: Option<String>,
+pub struct Preset<'a> {
+    pub ID: Option<&'a str>,
+    pub Details: Option<&'a str>,
+    pub State: Option<&'a str>,
     pub PartySize: Option<u8>,
     pub PartyMax: Option<u8>,
     pub Timestamps: Option<u8>,
-    pub CustomTimestamp: Option<String>,
-    pub LargeKey: Option<String>,
-    pub LargeText: Option<String>,
-    pub SmallKey: Option<String>,
-    pub SmallText: Option<String>,
-    pub Button1Text: Option<String>,
-    pub Button1URL: Option<String>,
-    pub Button2Text: Option<String>,
-    pub Button2URL: Option<String>,
+    pub CustomTimestamp: Option<&'a str>,
+    pub LargeKey: Option<&'a str>,
+    pub LargeText: Option<&'a str>,
+    pub SmallKey: Option<&'a str>,
+    pub SmallText: Option<&'a str>,
+    pub Button1Text: Option<&'a str>,
+    pub Button1URL: Option<&'a str>,
+    pub Button2Text: Option<&'a str>,
+    pub Button2URL: Option<&'a str>,
 }
 
-impl Preset {
+impl Preset<'_> {
     pub fn timestamp(&self) -> TimestampEnum {
         if self.Timestamps == None {
             return TimestampEnum::None;

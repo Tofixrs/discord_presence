@@ -94,15 +94,15 @@ impl App {
             true => cc.egui_ctx.set_visuals(egui::Visuals::dark()),
             false => cc.egui_ctx.set_visuals(egui::Visuals::light()),
         }
-        let mut client = DiscordIpcClient::new(&storage.id)
+        let mut client = DiscordIpcClient::new(storage.id)
             .expect("Failed to create client while loading storage");
         if storage.autoconnect {
             client.connect().expect("Failed to autoconnect on startup");
         }
         let mut app = App {
-            id: storage.id,
-            details: storage.details,
-            state: storage.state,
+            id: storage.id.to_owned(),
+            details: storage.details.to_owned(),
+            state: storage.state.to_owned(),
             party: storage.party,
             party_of: storage.party_of,
             timestamp: timestamp::Timestamp {
@@ -110,20 +110,20 @@ impl App {
                 date: Utc::now().date(),
             },
             first_btn: presence_button::PresenceButton {
-                label: storage.first_btn_label,
-                url: storage.first_btn_url,
+                label: storage.first_btn_label.to_owned(),
+                url: storage.first_btn_url.to_owned(),
             },
             second_btn: presence_button::PresenceButton {
-                label: storage.second_btn_label,
-                url: storage.second_btn_url,
+                label: storage.second_btn_label.to_owned(),
+                url: storage.second_btn_url.to_owned(),
             },
             first_img: image::Image {
-                key: storage.large_image_key,
-                text: storage.large_image_label,
+                key: storage.large_image_key.to_owned(),
+                text: storage.large_image_label.to_owned(),
             },
             second_img: image::Image {
-                key: storage.small_image_key,
-                text: storage.small_image_label,
+                key: storage.small_image_key.to_owned(),
+                text: storage.small_image_label.to_owned(),
             },
             menu_bar: menu_bar::MenuBar {
                 autoconnect: storage.autoconnect,
@@ -165,20 +165,20 @@ impl eframe::App for App {
         //     self.menu_bar.darkmode,
         // );
         let save = Storage {
-            id: self.id.as_str().to_string(),
-            details: self.details.as_str().to_string(),
-            state: self.state.as_str().to_string(),
+            id: &self.id,
+            details: &self.details,
+            state: &self.state,
             party: self.party,
             party_of: self.party_of,
             timestamp: self.timestamp.timestamp,
-            large_image_key: self.first_img.key.as_str().to_string(),
-            small_image_key: self.second_img.key.as_str().to_string(),
-            large_image_label: self.first_img.text.as_str().to_string(),
-            small_image_label: self.second_img.text.as_str().to_string(),
-            first_btn_label: self.first_btn.label.as_str().to_string(),
-            second_btn_label: self.second_btn.label.as_str().to_string(),
-            first_btn_url: self.first_btn.url.as_str().to_string(),
-            second_btn_url: self.second_btn.url.as_str().to_string(),
+            large_image_key: &self.first_img.key,
+            small_image_key: &self.second_img.key,
+            large_image_label: &self.first_img.text,
+            small_image_label: &self.second_img.text,
+            first_btn_label: &self.first_btn.label,
+            second_btn_label: &self.second_btn.label,
+            first_btn_url: &self.first_btn.url,
+            second_btn_url: &self.second_btn.url,
             autoconnect: self.menu_bar.autoconnect,
             darkmode: self.menu_bar.darkmode,
         };
@@ -373,47 +373,47 @@ impl App {
             .expect("Failed to set activity");
     }
     fn load_preset(&mut self) {
-        if self.menu_bar.loaded_preset != None {
+        if self.menu_bar.loaded_preset.is_some() {
             let preset = self.menu_bar.loaded_preset.as_ref().unwrap();
-            if preset.ID != None {
-                self.id = preset.ID.as_ref().unwrap().to_string();
+            if preset.ID.is_some() {
+                self.id = preset.ID.unwrap().to_string();
             }
-            if preset.Details != None {
-                self.details = preset.Details.as_ref().unwrap().to_string();
+            if preset.Details.is_some() {
+                self.details = preset.Details.unwrap().to_string();
             }
-            if preset.State != None {
-                self.state = preset.State.as_ref().unwrap().to_string();
+            if preset.State.is_some() {
+                self.state = preset.State.unwrap().to_string();
             }
-            if preset.PartySize != None {
+            if preset.PartySize.is_some() {
                 self.party = preset.PartySize.unwrap();
             }
-            if preset.PartyMax != None {
+            if preset.PartyMax.is_some() {
                 self.party_of = preset.PartyMax.unwrap();
             }
             self.timestamp.timestamp = preset.timestamp();
-            if preset.LargeKey != None {
-                self.first_img.key = preset.LargeKey.as_ref().unwrap().to_string()
+            if preset.LargeKey.is_some() {
+                self.first_img.key = preset.LargeKey.unwrap().to_string()
             }
-            if preset.LargeText != None {
-                self.first_img.text = preset.LargeText.as_ref().unwrap().to_string()
+            if preset.LargeText.is_some() {
+                self.first_img.text = preset.LargeText.unwrap().to_string()
             }
-            if preset.SmallKey != None {
-                self.second_img.key = preset.SmallKey.as_ref().unwrap().to_string()
+            if preset.SmallKey.is_some() {
+                self.second_img.key = preset.SmallKey.unwrap().to_string()
             }
-            if preset.SmallText != None {
-                self.second_img.text = preset.SmallText.as_ref().unwrap().to_string()
+            if preset.SmallText.is_some() {
+                self.second_img.text = preset.SmallText.unwrap().to_string()
             }
-            if preset.Button1Text != None {
-                self.first_btn.label = preset.Button1Text.as_ref().unwrap().to_string()
+            if preset.Button1Text.is_some() {
+                self.first_btn.label = preset.Button1Text.unwrap().to_string()
             }
-            if preset.Button1URL != None {
-                self.first_btn.url = preset.Button1URL.as_ref().unwrap().to_string()
+            if preset.Button1URL.is_some() {
+                self.first_btn.url = preset.Button1URL.unwrap().to_string()
             }
-            if preset.Button2Text != None {
-                self.second_btn.label = preset.Button2Text.as_ref().unwrap().to_string()
+            if preset.Button2Text.is_some() {
+                self.second_btn.label = preset.Button2Text.unwrap().to_string()
             }
-            if preset.Button2URL != None {
-                self.second_btn.url = preset.Button2URL.as_ref().unwrap().to_string()
+            if preset.Button2URL.is_some() {
+                self.second_btn.url = preset.Button2URL.unwrap().to_string()
             }
             self.menu_bar.loaded_preset = None
         }

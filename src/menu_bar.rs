@@ -10,7 +10,7 @@ pub struct MenuBar {
     pub check_updates: bool,
     pub darkmode: bool,
     pub about_me: bool,
-    pub loaded_preset: Option<Preset>,
+    pub loaded_preset: Option<Preset<'static>>,
 }
 
 impl Default for MenuBar {

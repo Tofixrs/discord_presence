@@ -4,21 +4,21 @@ use crate::timestamp::TimestampEnum;
 use derivative::Derivative;
 #[derive(Serialize, Deserialize, Derivative)]
 #[derivative(Default)]
-pub struct Storage {
-    pub id: String,
-    pub details: String,
-    pub state: String,
+pub struct Storage<'a> {
+    pub id: &'a str,
+    pub details: &'a str,
+    pub state: &'a str,
     pub party: u8,
     pub party_of: u8,
     pub timestamp: TimestampEnum,
-    pub large_image_key: String,
-    pub small_image_key: String,
-    pub large_image_label: String,
-    pub small_image_label: String,
-    pub first_btn_label: String,
-    pub second_btn_label: String,
-    pub first_btn_url: String,
-    pub second_btn_url: String,
+    pub large_image_key: &'a str,
+    pub small_image_key: &'a str,
+    pub large_image_label: &'a str,
+    pub small_image_label: &'a str,
+    pub first_btn_label: &'a str,
+    pub second_btn_label: &'a str,
+    pub first_btn_url: &'a str,
+    pub second_btn_url: &'a str,
     pub autoconnect: bool,
     #[derivative(Default(value = "true"))]
     pub darkmode: bool,
