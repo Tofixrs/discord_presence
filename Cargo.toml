@@ -7,6 +7,7 @@ edition = "2021"
 
 [dependencies]
 chrono = "0.4.22"
+derivative = "2.2.0"
 discord-rich-presence = "0.2.2"
 eframe = { version = "0.18.0", features = ["persistence"] }
 egui-datepicker = {git = "https://github.com/kzurawel/egui-datepicker.git"}

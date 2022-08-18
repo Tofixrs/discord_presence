@@ -1,8 +1,9 @@
 use serde::{Deserialize, Serialize};
 
 use crate::timestamp::TimestampEnum;
-
-#[derive(Serialize, Deserialize, Default)]
+use derivative::Derivative;
+#[derive(Serialize, Deserialize, Derivative)]
+#[derivative(Default)]
 pub struct Storage {
     pub id: String,
     pub details: String,
@@ -19,6 +20,7 @@ pub struct Storage {
     pub first_btn_url: String,
     pub second_btn_url: String,
     pub autoconnect: bool,
+    #[derivative(Default(value = "true"))]
     pub darkmode: bool,
 }
 
