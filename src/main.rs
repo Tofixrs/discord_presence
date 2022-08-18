@@ -374,46 +374,47 @@ impl App {
     }
     fn load_preset(&mut self) {
         if self.menu_bar.loaded_preset.is_some() {
-            let preset = self.menu_bar.loaded_preset.unwrap();
-            if preset.ID.is_some() {
-                self.id = preset.ID.unwrap().to_string();
+            let preset = self.menu_bar.loaded_preset.as_ref().unwrap();
+            if let Some(id) = preset.ID.as_ref() {
+                self.id = id.to_string();
             }
-            if preset.Details.is_some() {
-                self.details = preset.Details.unwrap().to_string();
+            if let Some(details) = preset.Details.as_ref() {
+                self.details = details.to_string();
             }
-            if preset.State.is_some() {
-                self.state = preset.State.unwrap().to_string();
+            if let Some(state) = preset.State.as_ref() {
+                self.state = state.to_string();
             }
-            if preset.PartySize.is_some() {
-                self.party = preset.PartySize.unwrap();
+            if let Some(size) = preset.PartySize {
+                self.party = size;
             }
-            if preset.PartyMax.is_some() {
-                self.party_of = preset.PartyMax.unwrap();
+            if let Some(size) = preset.PartyMax {
+                self.party_of = size;
             }
+
             self.timestamp.timestamp = preset.timestamp();
-            if preset.LargeKey.is_some() {
-                self.first_img.key = preset.LargeKey.unwrap().to_string()
+            if let Some(key) = preset.LargeKey.as_ref() {
+                self.first_img.key = key.to_string();
             }
-            if preset.LargeText.is_some() {
-                self.first_img.text = preset.LargeText.unwrap().to_string()
+            if let Some(text) = preset.LargeText.as_ref() {
+                self.first_img.text = text.to_string();
             }
-            if preset.SmallKey.is_some() {
-                self.second_img.key = preset.SmallKey.unwrap().to_string()
+            if let Some(key) = preset.SmallKey.as_ref() {
+                self.second_img.key = key.to_string();
             }
-            if preset.SmallText.is_some() {
-                self.second_img.text = preset.SmallText.unwrap().to_string()
+            if let Some(text) = preset.SmallText.as_ref() {
+                self.second_img.text = text.to_string();
             }
-            if preset.Button1Text.is_some() {
-                self.first_btn.label = preset.Button1Text.unwrap().to_string()
+            if let Some(text) = preset.Button1Text.as_ref() {
+                self.first_btn.label = text.to_string();
             }
-            if preset.Button1URL.is_some() {
-                self.first_btn.url = preset.Button1URL.unwrap().to_string()
+            if let Some(text) = preset.Button2Text.as_ref() {
+                self.second_btn.label = text.to_string();
             }
-            if preset.Button2Text.is_some() {
-                self.second_btn.label = preset.Button2Text.unwrap().to_string()
+            if let Some(url) = preset.Button2URL.as_ref() {
+                self.second_btn.url = url.to_string();
             }
-            if preset.Button2URL.is_some() {
-                self.second_btn.url = preset.Button2URL.unwrap().to_string()
+            if let Some(url) = preset.Button1URL.as_ref() {
+                self.first_btn.url = url.to_string();
             }
             self.menu_bar.loaded_preset = None
         }
