@@ -29,9 +29,13 @@ Note: While on windows windows defender may trigger. This is due this app being 
 - rust
 - gtk3 (for file picker)
 
+##### MacOS (Not Supported)
+
+- rust
+
 #### Compiling
 
-Simply run `cargo build --release`  
+Simply run `cargo build --release` in terminal
 The executable will be located in ./target/release
 
 ## Usage
