@@ -1,11 +1,10 @@
 # Discord Presence
 
-> :warning: **Macos is **NOT** supported** This is due the package for setting the presence being broken on mac.  
-> It may work for some people (only while compiling themself. You can find how to do that [here](#compiling-from-source)) but as far as i know it is broken.
-
+> :warning: **macOS is NOT supported**. This is due the package for setting the presence being broken on mac.  
+> It may work for some people (only when compiling manually. You can find how to do that [here](#compiling-from-source)) but as far as I know it is broken.
 ## Description
 
-A cross-platform application for custom presence on discord
+A cross-platform application for custom presence on Discord.
 
 ## Example
 
@@ -13,8 +12,8 @@ A cross-platform application for custom presence on discord
 
 ## Installation
 
-Download the newest release and run it. Thats it :D (On linux you also have to make it executable)
-Note: While on windows windows defender may trigger. This is due this app being not signed (yet or ever) and it being very new.
+Download the newest release and run it. Thats it :D (On Linux you also have to make it executable by running `chmod +x discord_presence-linux`)
+Note: On Windows, Microsoft Defender may trigger. This is due this app being not signed (yet or ever) and it being very new.
 
 ### Compiling from source
 
@@ -22,26 +21,26 @@ Note: While on windows windows defender may trigger. This is due this app being 
 
 ##### Windows
 
-- rust (yes thats it)
+- [rust](https://rustup.rs/) (yes thats it)
 
 ##### Linux
 
-- rust
+- [rust](https://rustup.rs/)
 - gtk3 (for file picker)
 
 ##### MacOS (Not Supported)
 
-- rust
+- [rust](https://rustup.rs/)
 
 #### Compiling
 
 Simply run `cargo build --release` in terminal.  
-The executable will be located in ./target/release
+The executable will be located in ./target/release.
 
 ## Usage
 
-### TODO
+### To-Do
 
 ## Contact
 
-Discord: Tofix.rs#4592
+Discord: [Tofix.rs#4592](https://discord.com/users/436947586788884490)
