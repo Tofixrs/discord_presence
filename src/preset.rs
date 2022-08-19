@@ -59,10 +59,7 @@ impl Preset {
     }
 
     pub fn to_xml(&self) -> String {
-        let file = serde_xml_rs::to_string(self).unwrap();
-        let (_, xml) = file.split_at(8);
-        let xml = r#"<?xml version="1.0"?><Preset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">"#.to_string()
-                + xml;
+        let xml = serde_xml_rs::to_string(self).unwrap();
 
         xml.replace("<CustomTimestamp></CustomTimestamp>", "")
     }
