@@ -81,8 +81,24 @@ impl Default for App {
     }
 }
 
+fn setup_font(ctx: &egui::Context) {
+    let mut fonts = egui::FontDefinitions::default();
+    fonts.font_data.insert(
+        "Emoji".to_owned(),
+        egui::FontData::from_static(include_bytes!("../assets/fonts/TwitterColorEmoji.ttf")),
+    );
+    fonts
+        .families
+        .entry(egui::FontFamily::Proportional)
+        .or_default()
+        .insert(0, "Emoji".to_owned());
+
+    ctx.set_fonts(fonts);
+}
+
 impl App {
     fn new(cc: &eframe::CreationContext<'_>) -> Self {
+        setup_font(&cc.egui_ctx);
         let storage = match cc.storage.unwrap().get_string("settings") {
             None => "".to_string(),
             Some(value) => value,

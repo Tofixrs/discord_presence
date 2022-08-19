@@ -2,6 +2,14 @@
 name = "discord_presence"
 version = "0.3.0"
 edition = "2021"
+authors= ["Tofix.rs"]
+description = "A cross-platform application for custom presence on discord"
+
+# repo stuff
+readme = "README.md"
+homepage = "https://github.com/Tofix26/discord_presence"
+repository = "https://github.com/Tofix26/discord_presence"
+license-file = "LICENSE"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
