@@ -146,24 +146,6 @@ impl eframe::App for App {
         false
     }
     fn save(&mut self, storage: &mut dyn eframe::Storage) {
-        // let save = Storage::new(
-        //     &self.id,
-        //     &self.details,
-        //     &self.state,
-        //     self.party,
-        //     self.party_of,
-        //     self.timestamp.timestamp,
-        //     &self.first_img.key,
-        //     &self.second_img.key,
-        //     &self.first_img.text,
-        //     &self.second_img.text,
-        //     &self.first_btn.label,
-        //     &self.second_btn.label,
-        //     &self.first_btn.url,
-        //     &self.second_btn.url,
-        //     self.menu_bar.autoconnect,
-        //     self.menu_bar.darkmode,
-        // );
         let save = Storage {
             id: &self.id,
             details: &self.details,
@@ -264,6 +246,8 @@ impl eframe::App for App {
                 }
             });
         });
+
+        //about window
         egui::containers::Window::new("About")
             .open(&mut self.menu_bar.about_me)
             .resizable(false)
@@ -271,7 +255,7 @@ impl eframe::App for App {
             .show(ctx, |ui| {
                 ui.with_layout(Layout::top_down(Align::Center), |ui| {
                     ui.heading("Discord Presence");
-                    ui.label("Version v0.2-beta");
+                    ui.label("Version v0.2.1-beta");
                 });
             });
         self.load_preset()
