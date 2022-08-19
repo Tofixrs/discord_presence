@@ -7,11 +7,12 @@ mod preset;
 mod storage;
 mod timestamp;
 
+use preset::Preset;
 use storage::Storage;
 use timestamp::{Timestamp, TimestampEnum};
 
 use std::time::Duration;
-use std::vec;
+use std::{fs, vec};
 
 use serde_json::{from_str, to_string};
 
@@ -40,7 +41,7 @@ fn main() {
         Box::new(|cc| Box::new(App::new(cc))),
     );
 }
-struct App {
+pub struct App {
     menu_bar: menu_bar::MenuBar,
     first_btn: presence_button::PresenceButton,
     second_btn: presence_button::PresenceButton,
@@ -255,10 +256,11 @@ impl eframe::App for App {
             .show(ctx, |ui| {
                 ui.with_layout(Layout::top_down(Align::Center), |ui| {
                     ui.heading("Discord Presence");
-                    ui.label("Version v0.2.1-beta");
+                    ui.label("Version v0.3-beta");
                 });
             });
-        self.load_preset()
+        self.load_preset();
+        self.save_preset();
     }
 }
 impl App {
@@ -375,7 +377,7 @@ impl App {
                 self.party_of = size;
             }
 
-            self.timestamp.timestamp = preset.timestamp();
+            self.timestamp.timestamp = preset.timestamp_from_num();
             if let Some(key) = preset.LargeKey.as_ref() {
                 self.first_img.key = key.to_string();
             }
@@ -400,7 +402,23 @@ impl App {
             if let Some(url) = preset.Button1URL.as_ref() {
                 self.first_btn.url = url.to_string();
             }
-            self.menu_bar.loaded_preset = None
+            self.menu_bar.loaded_preset = None;
+
+            if self.connected {
+                self.set_presence()
+            }
+        }
+    }
+
+    fn save_preset(&mut self) {
+        if self.menu_bar.preset_save_location.is_some() {
+            let preset = Preset::from_app(self);
+            fs::write(
+                self.menu_bar.preset_save_location.as_ref().unwrap(),
+                preset.to_xml(),
+            )
+            .expect("Failed to save preset");
+            self.menu_bar.preset_save_location = None;
         }
     }
 }

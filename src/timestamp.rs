@@ -16,6 +16,19 @@ pub enum TimestampEnum {
     LocalTime,
     CustomTimeStamp,
 }
+
+impl TimestampEnum {
+    pub fn to_num(self) -> u8 {
+        match self {
+            TimestampEnum::None => 0,
+            TimestampEnum::SinceStart => 1,
+            TimestampEnum::SinceLastUpdate => 4,
+            TimestampEnum::LocalTime => 2,
+            TimestampEnum::CustomTimeStamp => 3,
+        }
+    }
+}
+
 pub struct Timestamp {
     pub timestamp: TimestampEnum,
     pub date: Date<Utc>,

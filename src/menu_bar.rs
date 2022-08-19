@@ -11,6 +11,7 @@ pub struct MenuBar {
     pub darkmode: bool,
     pub about_me: bool,
     pub loaded_preset: Option<Preset>,
+    pub preset_save_location: Option<PathBuf>,
 }
 
 impl Default for MenuBar {
@@ -23,6 +24,7 @@ impl Default for MenuBar {
             darkmode: true,
             about_me: false,
             loaded_preset: None,
+            preset_save_location: None,
         }
     }
 }
@@ -41,7 +43,9 @@ impl MenuBar {
             if ui.button("Load Preset | Ctrl + O").clicked() {
                 self.load_preset();
             }
-            if ui.button("Save Preset | Ctrl + S").clicked() {}
+            if ui.button("Save Preset | Ctrl + S").clicked() {
+                self.save_preset();
+            }
             if ui.button("Upload Assets | Ctrl + U").clicked() {}
             if ui.button("Exit | Alt + F4").clicked() {
                 exit(0)
@@ -66,20 +70,27 @@ impl MenuBar {
             }
         });
     }
+
     fn load_preset(&mut self) {
-        let file = match FileDialog::new()
+        let file = FileDialog::new()
             .add_filter("Preset", &["crp"])
             .set_directory("/")
             .set_title("Load preset")
-            .pick_file()
-        {
-            None => PathBuf::new(),
-            Some(path) => path,
-        };
-        if file.to_str().unwrap() != "" {
+            .pick_file();
+        if let Some(file) = file {
             let file = fs::read_to_string(file).unwrap();
             let xml: Preset = serde_xml_rs::from_str(&file).unwrap();
             self.loaded_preset = Some(xml);
         }
+    }
+
+    fn save_preset(&mut self) {
+        let file = FileDialog::new()
+            .add_filter("Preset", &["crp"])
+            .set_directory("/")
+            .set_title("Save Preset")
+            .set_file_name("Preset")
+            .save_file();
+        self.preset_save_location = file;
     }
 }
