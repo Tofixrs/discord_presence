@@ -1,5 +1,6 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")] // hide console window on Windows in release
 
+mod error_bar;
 mod image;
 mod menu_bar;
 mod presence_button;
@@ -7,6 +8,9 @@ mod preset;
 mod storage;
 mod timestamp;
 
+use error_bar::ErrorBar;
+use image::Image;
+use presence_button::PresenceButton;
 use preset::Preset;
 use storage::Storage;
 use timestamp::{Timestamp, TimestampEnum};
@@ -42,6 +46,7 @@ fn main() {
     );
 }
 pub struct App {
+    error_bar: ErrorBar,
     menu_bar: menu_bar::MenuBar,
     first_btn: presence_button::PresenceButton,
     second_btn: presence_button::PresenceButton,
@@ -62,11 +67,12 @@ pub struct App {
 impl Default for App {
     fn default() -> Self {
         Self {
+            error_bar: ErrorBar::default(),
             menu_bar: menu_bar::MenuBar::default(),
-            first_btn: presence_button::PresenceButton::default(),
-            second_btn: presence_button::PresenceButton::default(),
-            first_img: image::Image::default(),
-            second_img: image::Image::default(),
+            first_btn: PresenceButton::default(),
+            second_btn: PresenceButton::default(),
+            first_img: Image::default(),
+            second_img: Image::default(),
             id: String::new(),
             details: String::new(),
             party: 0,
@@ -111,11 +117,15 @@ impl App {
             true => cc.egui_ctx.set_visuals(egui::Visuals::dark()),
             false => cc.egui_ctx.set_visuals(egui::Visuals::light()),
         }
-        let mut client = DiscordIpcClient::new(storage.id)
-            .expect("Failed to create client while loading storage");
-        if storage.autoconnect {
-            client.connect().expect("Failed to autoconnect on startup");
-        }
+        let mut client =
+            DiscordIpcClient::new(storage.id).expect("No reason for this  to failed either");
+        let error = match storage.autoconnect {
+            true => match client.connect() {
+                Ok(_) => "",
+                Err(_) => "Failed to connect. (AutoConnect)",
+            },
+            false => "",
+        };
         let mut app = App {
             id: storage.id.to_owned(),
             details: storage.details.to_owned(),
@@ -150,7 +160,10 @@ impl App {
             client,
             ..Default::default()
         };
-        if storage.autoconnect {
+        if !error.is_empty() {
+            app.error_bar.new_error(error.to_string());
+        }
+        if storage.autoconnect && error.is_empty() {
             app.set_presence();
             app.connected = true;
         }
@@ -181,10 +194,15 @@ impl eframe::App for App {
             autoconnect: self.menu_bar.autoconnect,
             darkmode: self.menu_bar.darkmode,
         };
-        storage.set_string(
-            "settings",
-            to_string(&save).expect("Failed to parse save struct"),
-        );
+        let storage_string = match to_string(&save) {
+            Ok(save) => save,
+            Err(_) => "".to_string(),
+        };
+        if storage_string.is_empty() {
+            self.error_bar.new_error("Failed to save".to_string());
+            return;
+        }
+        storage.set_string("settings", storage_string);
     }
     fn auto_save_interval(&self) -> std::time::Duration {
         Duration::from_secs(5)
@@ -205,18 +223,28 @@ impl eframe::App for App {
                     .clicked()
                     && !self.id.is_empty()
                 {
-                    self.client = DiscordIpcClient::new(&self.id).expect("sus");
-                    self.client.connect().expect("Failed to connect to discord");
-                    self.last_update = Utc::now();
-                    self.set_presence();
-                    self.connected = true;
+                    self.client = DiscordIpcClient::new(&self.id)
+                        .expect("Theres no reason for this function to fail bruh");
+                    let error = match self.client.connect() {
+                        Ok(_) => "",
+                        Err(_) => "Failed to connect to discord",
+                    };
+                    if error.is_empty() {
+                        self.last_update = Utc::now();
+                        self.set_presence();
+                        self.connected = true;
+                    } else {
+                        self.error_bar.new_error(error.to_string());
+                    }
                 }
                 ui.add_space(10.);
                 if ui
                     .add_enabled(self.connected, egui::Button::new("Disconnect"))
                     .clicked()
                 {
-                    self.client.close().expect("Failed to disconnect");
+                    self.client
+                        .close()
+                        .expect("Theres no reason for this function to fail bruh");
                     self.connected = false;
                 }
             });
@@ -272,22 +300,31 @@ impl eframe::App for App {
             .show(ctx, |ui| {
                 ui.with_layout(Layout::top_down(Align::Center), |ui| {
                     ui.heading("Discord Presence");
-                    ui.label("Version v0.3-beta");
+                    ui.label("Version v0.5-beta");
                 });
             });
+
+        //preset stuff
         self.load_preset();
         self.save_preset();
+
+        //Error bar
+        self.error_bar.run(ctx);
     }
 }
 impl App {
     fn set_presence(&mut self) {
         if self.id != self.client.client_id {
-            self.client
-                .close()
-                .expect("Failed to disconnect while updating application");
-            self.client = DiscordIpcClient::new(&self.id)
-                .expect("Failed to create client while updating application id");
-            self.client.connect().expect("Failed to connect to discord");
+            self.client.close().expect("No Reason for this to fail...");
+            self.client = DiscordIpcClient::new(&self.id).expect("No Reason for this to fail...");
+            let error = match self.client.connect() {
+                Ok(_) => "",
+                Err(_) => "Failed to connect to discord",
+            };
+            if !error.is_empty() {
+                self.error_bar.new_error(error.to_string());
+                return;
+            }
         }
         let first_btn = Button::new(&self.first_btn.label, &self.first_btn.url);
         let second_btn = Button::new(&self.second_btn.label, &self.second_btn.url);
@@ -370,10 +407,15 @@ impl App {
             true => activity.party(Party::new().size([self.party_of as i32, self.party as i32])),
             false => activity,
         };
-        self.client
-            .set_activity(activity)
-            .expect("Failed to set activity");
+        let error = match self.client.set_activity(activity) {
+            Ok(_) => "",
+            Err(_) => "Failed to set activity",
+        };
+        if !error.is_empty() {
+            self.error_bar.new_error(error.to_string());
+        }
     }
+
     fn load_preset(&mut self) {
         if self.menu_bar.loaded_preset.is_some() {
             let preset = self.menu_bar.loaded_preset.as_ref().unwrap();
@@ -429,11 +471,15 @@ impl App {
     fn save_preset(&mut self) {
         if self.menu_bar.preset_save_location.is_some() {
             let preset = Preset::from_app(self);
-            fs::write(
+            match fs::write(
                 self.menu_bar.preset_save_location.as_ref().unwrap(),
                 preset.to_xml(),
-            )
-            .expect("Failed to save preset");
+            ) {
+                Ok(_) => (),
+                Err(_) => self
+                    .error_bar
+                    .new_error("Failed to save preset".to_string()),
+            }
             self.menu_bar.preset_save_location = None;
         }
     }

@@ -80,6 +80,7 @@ impl MenuBar {
         if let Some(file) = file {
             let file = fs::read_to_string(file).unwrap();
             let xml: Preset = serde_xml_rs::from_str(&file).unwrap();
+            println!("{:?}", xml);
             self.loaded_preset = Some(xml);
         }
     }
