@@ -9,7 +9,7 @@ cp ../target/release/discord_presence ./App/bin/discord_presence
 zip -r Linux-portable.zip App
 mv Linux-portable.zip ../outupt
 rm App/bin/discord_presence
-cp ../target/x86_64-pc-windows-gnu/release/discord_presence.exe ./App/bin/discord_presence
+cp ../target/x86_64-pc-windows-gnu/release/discord_presence.exe ./App/bin/discord_presence.exe
 zip -r Windows-portable.zip App
 mv Windows-portable.zip ../outupt
 rm -r App
