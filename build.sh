@@ -28,8 +28,8 @@ Exec=Bin/discord_presence
 Type=Application
 Categories=Utility
 Icon=Icon" >> discord_presence.desktop
-wget https://cdn.discordapp.com/avatars/436947586788884490/5ec54263e5f8c80ca91674fe5124ffa3.webp?size=256
-mv 5ec54263e5f8c80ca91674fe5124ffa3.webp?size=256 Icon.png
+wget https://cdn.discordapp.com/avatars/436947586788884490/5ec54263e5f8c80ca91674fe5124ffa3.png?size=256
+mv 5ec54263e5f8c80ca91674fe5124ffa3.png?size=256 Icon.png
 cp -r ../../assets ./
 cd ../
 ARCH=x86_64 appimagetool discord_presence.AppDir
