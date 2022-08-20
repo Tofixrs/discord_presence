@@ -1,5 +1,9 @@
 use crate::preset::Preset;
-use eframe::egui::{self, Ui};
+use eframe::{
+    egui::{self, Layout, Ui},
+    emath::Align,
+    epaint::Vec2,
+};
 use rfd::FileDialog;
 use std::{fs, path::PathBuf, process::exit};
 
@@ -37,6 +41,18 @@ impl MenuBar {
                 self.help(ui);
             })
         });
+
+        //about me
+        egui::containers::Window::new("About")
+            .open(&mut self.about_me)
+            .resizable(false)
+            .fixed_size(Vec2::new(200., 100.))
+            .show(ctx, |ui| {
+                ui.with_layout(Layout::top_down(Align::Center), |ui| {
+                    ui.heading("Discord Presence");
+                    ui.label("Version v0.5-beta");
+                });
+            });
     }
     fn file(&mut self, ui: &mut Ui) {
         ui.menu_button("File", |ui| {

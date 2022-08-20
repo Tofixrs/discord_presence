@@ -292,18 +292,6 @@ impl eframe::App for App {
             });
         });
 
-        //about window
-        egui::containers::Window::new("About")
-            .open(&mut self.menu_bar.about_me)
-            .resizable(false)
-            .fixed_size(Vec2::new(200., 100.))
-            .show(ctx, |ui| {
-                ui.with_layout(Layout::top_down(Align::Center), |ui| {
-                    ui.heading("Discord Presence");
-                    ui.label("Version v0.5-beta");
-                });
-            });
-
         //preset stuff
         self.load_preset();
         self.save_preset();
