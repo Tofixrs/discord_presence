@@ -22,6 +22,7 @@ SELF=$(readlink -f "$0")
 HERE=${SELF%/*}
 EXEC="${HERE}/usr/bin/Bin/discord_presence"
 exec "${EXEC}"" >> AppRun
+chmod +x AppRun
 echo "[Desktop Entry]
 Name=Discord Presence
 Exec=Bin/discord_presence
