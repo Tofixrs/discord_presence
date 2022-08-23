@@ -50,7 +50,7 @@ impl MenuBar {
             .show(ctx, |ui| {
                 ui.with_layout(Layout::top_down(Align::Center), |ui| {
                     ui.heading("Discord Presence");
-                    ui.label("Version v0.5-beta");
+                    ui.label("Version v0.5.1-beta");
                 });
             });
     }
@@ -96,7 +96,6 @@ impl MenuBar {
         if let Some(file) = file {
             let file = fs::read_to_string(file).unwrap();
             let xml: Preset = serde_xml_rs::from_str(&file).unwrap();
-            println!("{:?}", xml);
             self.loaded_preset = Some(xml);
         }
     }

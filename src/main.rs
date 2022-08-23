@@ -385,7 +385,7 @@ impl App {
             buttons.push(second_btn);
         }
 
-        let activity = match buttons.is_empty() {
+        let activity = match !buttons.is_empty() {
             true => activity.buttons(buttons),
             false => activity,
         };
