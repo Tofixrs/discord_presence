@@ -1,4 +1,5 @@
 use crate::preset::{InAppPreset, Preset};
+use derivative::Derivative;
 use eframe::{
     egui::{self, Layout, Ui},
     emath::Align,
@@ -8,11 +9,15 @@ use rfd::FileDialog;
 use serde_json::{from_str, to_string};
 use std::{fs, path::PathBuf, process::exit};
 
+#[derive(Derivative)]
+#[derivative(Default)]
 pub struct MenuBar {
     pub run_on_startup: bool,
     pub start_minimized: bool,
     pub autoconnect: bool,
+    #[derivative(Default(value = "true"))]
     pub check_updates: bool,
+    #[derivative(Default(value = "true"))]
     pub darkmode: bool,
     pub about_me: bool,
     pub loaded_preset: Option<Preset>,
@@ -23,24 +28,6 @@ pub struct MenuBar {
     pub presets: String,
 }
 
-impl Default for MenuBar {
-    fn default() -> Self {
-        Self {
-            run_on_startup: false,
-            start_minimized: false,
-            autoconnect: false,
-            check_updates: true,
-            darkmode: true,
-            about_me: false,
-            loaded_preset: None,
-            preset_save_location: None,
-            save_menu: false,
-            preset_name: String::new(),
-            in_app_save: String::new(),
-            presets: String::new(),
-        }
-    }
-}
 impl MenuBar {
     pub fn run(&mut self, ctx: &egui::Context) {
         egui::TopBottomPanel::top("menu_bar").show(ctx, |ui| {
