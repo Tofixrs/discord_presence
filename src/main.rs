@@ -1,4 +1,5 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")] // hide console window on Windows in release
+#![feature(drain_filter)]
 
 mod error_bar;
 mod image;
@@ -11,7 +12,7 @@ mod timestamp;
 use error_bar::ErrorBar;
 use image::Image;
 use presence_button::PresenceButton;
-use preset::Preset;
+use preset::{InAppPreset, Preset};
 use storage::Storage;
 use timestamp::{Timestamp, TimestampEnum};
 
@@ -109,6 +110,10 @@ impl App {
             None => "".to_string(),
             Some(value) => value,
         };
+        let presets = match cc.storage.unwrap().get_string("presets") {
+            None => "".to_string(),
+            Some(value) => value,
+        };
         let storage: Storage = match from_str(&storage) {
             Ok(storage) => storage,
             Err(_) => Storage::default(),
@@ -155,6 +160,7 @@ impl App {
             menu_bar: menu_bar::MenuBar {
                 autoconnect: storage.autoconnect,
                 darkmode: storage.darkmode,
+                presets,
                 ..Default::default()
             },
             client,
@@ -203,6 +209,7 @@ impl eframe::App for App {
             return;
         }
         storage.set_string("settings", storage_string);
+        storage.set_string("presets", self.menu_bar.presets.clone());
     }
     fn auto_save_interval(&self) -> std::time::Duration {
         Duration::from_secs(5)
@@ -295,6 +302,7 @@ impl eframe::App for App {
         //preset stuff
         self.load_preset();
         self.save_preset();
+        self.save_preset_in_app();
 
         //Error bar
         self.error_bar.run(ctx);
@@ -469,6 +477,23 @@ impl App {
                     .new_error("Failed to save preset".to_string()),
             }
             self.menu_bar.preset_save_location = None;
+        }
+    }
+
+    fn save_preset_in_app(&mut self) {
+        if !self.menu_bar.in_app_save.is_empty() {
+            let mut presets: Vec<InAppPreset> = match from_str(&self.menu_bar.presets) {
+                Ok(presets) => presets,
+                Err(_) => Vec::new(),
+            };
+            presets.push(InAppPreset::from_app(
+                &self,
+                self.menu_bar.in_app_save.clone(),
+            ));
+
+            self.menu_bar.presets = to_string(&presets).unwrap();
+
+            self.menu_bar.in_app_save = String::new();
         }
     }
 }

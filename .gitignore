@@ -1,3 +1,5 @@
 /target
 /App
-node_modules
+/node_modules
+/outupt
+/output
