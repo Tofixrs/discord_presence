@@ -13,7 +13,7 @@ A cross-platform application for custom presence on Discord.
 
 ## Installation
 
-Download the newest release and run it. Thats it :D (On Linux you also have to make it executable by running `chmod +x discord_presence-linux`)
+Download the newest release from the releases and run it. Thats it :D (On Linux you also have to make it executable by running `chmod +x discord_presence-linux`)
 Note: On Windows, Microsoft Defender may trigger. This is due this app being not signed (yet or ever) and it being very new.
 
 ### Compiling from source
