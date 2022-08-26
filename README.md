@@ -35,7 +35,7 @@ Note: On Windows, Microsoft Defender may trigger. This is due this app being not
 
 #### Compiling
 
-On Windows open cmd and run build_win.bat
+On Windows open cmd and run build_win.bat  
 On Mac and Linux open terminal and run build_unix.sh
 
 ## Usage
