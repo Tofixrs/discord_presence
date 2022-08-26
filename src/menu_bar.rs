@@ -47,7 +47,7 @@ impl MenuBar {
             .show(ctx, |ui| {
                 ui.with_layout(Layout::top_down(Align::Center), |ui| {
                     ui.heading("Discord Presence");
-                    ui.label("Version v0.6-beta");
+                    ui.label("Version v0.6.1-beta");
                 });
             });
 

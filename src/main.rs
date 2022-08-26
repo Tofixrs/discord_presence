@@ -267,9 +267,9 @@ impl eframe::App for App {
                 ui.label("State");
                 ui.text_edit_singleline(&mut self.state);
                 ui.label("Party");
-                ui.add(egui::DragValue::new(&mut self.party).clamp_range(0..=32));
-                ui.label("of");
                 ui.add(egui::DragValue::new(&mut self.party_of).clamp_range(1..=32));
+                ui.label("of");
+                ui.add(egui::DragValue::new(&mut self.party).clamp_range(0..=32));
             });
             ui.add_space(15.);
             self.timestamp.run(ui);
@@ -399,7 +399,7 @@ impl App {
         };
 
         let part_exists = self.party != 0;
-        let activity = match part_exists && self.state.is_empty() {
+        let activity = match part_exists && !self.state.is_empty() {
             true => activity.party(Party::new().size([self.party_of as i32, self.party as i32])),
             false => activity,
         };
