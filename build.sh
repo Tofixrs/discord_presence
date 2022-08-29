@@ -30,12 +30,13 @@ Exec=bin/discord_presence
 Type=Application
 Categories=Utility
 Icon=Icon" >> discord_presence.desktop
-wget https://cdn.discordapp.com/avatars/436947586788884490/5ec54263e5f8c80ca91674fe5124ffa3.png?size=256
-mv 5ec54263e5f8c80ca91674fe5124ffa3.png?size=256 Icon.png
+wget https://cdn.discordapp.com/avatars/436947586788884490/477e042f4462076e5c0e4778560cbfcd.webp?size=256
+mv 477e042f4462076e5c0e4778560cbfcd.webp?size=256 Icon.png
 cp -r ../../assets ./usr/bin/
 cd ../
 ARCH=x86_64 appimagetool discord_presence.AppDir
 mv Discord_Presence-x86_64.AppImage ../output/Discord_Presence-linux.AppImage
 cd ../
 rm -r temp
+rm -r App
 unzip ./output/Windows-portable.zip

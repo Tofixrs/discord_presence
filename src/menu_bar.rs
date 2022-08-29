@@ -1,9 +1,10 @@
 use crate::preset::{InAppPreset, Preset};
+use chrono::Utc;
 use derivative::Derivative;
 use eframe::{
-    egui::{self, Layout, Ui},
+    egui::{self, Layout, RichText, Ui},
     emath::Align,
-    epaint::Vec2,
+    epaint::{Color32, Vec2},
 };
 use rfd::FileDialog;
 use serde_json::{from_str, to_string};
@@ -26,6 +27,12 @@ pub struct MenuBar {
     pub save_menu: bool,
     pub preset_name: String,
     pub presets: String,
+    pub preset_switch_time: u8,
+    pub preset_switch_1: Option<InAppPreset>,
+    pub preset_switch_2: Option<InAppPreset>,
+    pub preset_switch_current: u8,
+    pub preset_till: i64,
+    pub run_switcher: bool,
 }
 
 impl MenuBar {
@@ -36,6 +43,7 @@ impl MenuBar {
                 self.settings(ui);
                 self.presets(ui);
                 self.help(ui);
+                self.switcher(ui);
             })
         });
 
@@ -47,7 +55,7 @@ impl MenuBar {
             .show(ctx, |ui| {
                 ui.with_layout(Layout::top_down(Align::Center), |ui| {
                     ui.heading("Discord Presence");
-                    ui.label("Version v0.6.1-beta");
+                    ui.label("Version v0.7-beta");
                 });
             });
 
@@ -144,6 +152,76 @@ impl MenuBar {
                 }
             });
         });
+    }
+
+    fn switcher(&mut self, ui: &mut Ui) {
+        ui.menu_button("Switcher", |ui| {
+            ui.hyperlink_to(
+                "Guide",
+                "https://tofix26.github.io/discord-presence-page/docs/guide/presets",
+            );
+            ui.add_space(5.);
+            let title = match &self.preset_switch_1 {
+                None => "Pick first preset".to_string(),
+                Some(preset) => preset.name.clone(),
+            };
+            ui.menu_button(title, |ui| {
+                let presets: Vec<InAppPreset> = match from_str(&self.presets) {
+                    Ok(presets) => presets,
+                    Err(_) => Vec::new(),
+                };
+                for preset in presets.iter() {
+                    if ui.button(&preset.name).clicked() {
+                        self.preset_switch_1 = Some(preset.clone());
+                    }
+                }
+            });
+            ui.add_space(5.);
+
+            let title = match &self.preset_switch_2 {
+                None => "Pick second preset".to_string(),
+                Some(preset) => preset.name.clone(),
+            };
+            ui.menu_button(title, |ui| {
+                let presets: Vec<InAppPreset> = match from_str(&self.presets) {
+                    Ok(presets) => presets,
+                    Err(_) => Vec::new(),
+                };
+                for preset in presets.iter() {
+                    if ui.button(&preset.name).clicked() {
+                        self.preset_switch_2 = Some(preset.clone());
+                    }
+                }
+            });
+            ui.add_space(5.);
+
+            ui.horizontal(|ui| {
+                ui.label(RichText::new("Switch every: ").color(Color32::from_rgb(163, 163, 163)));
+                ui.add(
+                    egui::widgets::DragValue::new(&mut self.preset_switch_time)
+                        .clamp_range(10..=255)
+                        .suffix("s"),
+                );
+            });
+            ui.checkbox(&mut self.run_switcher, "Run Switcher");
+        });
+        if (self.preset_till < Utc::now().timestamp())
+            && self.run_switcher
+            && self.preset_switch_1.is_some()
+            && self.preset_switch_2.is_some()
+        {
+            self.loaded_preset = match self.preset_switch_current {
+                1 => Some(self.preset_switch_1.clone().unwrap().to_preset()),
+                2 => Some(self.preset_switch_2.clone().unwrap().to_preset()),
+                _ => Some(self.preset_switch_1.clone().unwrap().to_preset()),
+            };
+            self.preset_switch_current = match self.preset_switch_current {
+                1 => 2,
+                2 => 1,
+                _ => 1,
+            };
+            self.preset_till = Utc::now().timestamp() + 5;
+        }
     }
 
     fn load_preset(&mut self) {

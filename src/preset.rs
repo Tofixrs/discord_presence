@@ -128,4 +128,23 @@ impl InAppPreset {
             Button2URL: Some(app.second_btn.url.clone()),
         }
     }
+    pub fn to_preset(self) -> Preset {
+        Preset {
+            ID: self.ID,
+            Details: self.Details,
+            State: self.State,
+            PartySize: self.PartySize,
+            PartyMax: self.PartyMax,
+            Timestamps: self.Timestamps,
+            CustomTimestamp: self.CustomTimestamp,
+            LargeKey: self.LargeKey,
+            LargeText: self.LargeText,
+            SmallKey: self.SmallKey,
+            SmallText: self.SmallText,
+            Button1Text: self.Button1Text,
+            Button1URL: self.Button1URL,
+            Button2Text: self.Button2Text,
+            Button2URL: self.Button2URL,
+        }
+    }
 }

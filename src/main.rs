@@ -161,6 +161,9 @@ impl App {
                 autoconnect: storage.autoconnect,
                 darkmode: storage.darkmode,
                 presets,
+                preset_switch_1: storage.preset_switch_1,
+                preset_switch_2: storage.preset_switch_2,
+                preset_switch_time: storage.preset_switch_time,
                 ..Default::default()
             },
             client,
@@ -199,6 +202,9 @@ impl eframe::App for App {
             second_btn_url: &self.second_btn.url,
             autoconnect: self.menu_bar.autoconnect,
             darkmode: self.menu_bar.darkmode,
+            preset_switch_1: self.menu_bar.preset_switch_1.clone(),
+            preset_switch_2: self.menu_bar.preset_switch_2.clone(),
+            preset_switch_time: self.menu_bar.preset_switch_time,
         };
         let storage_string = match to_string(&save) {
             Ok(save) => save,

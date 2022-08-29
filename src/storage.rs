@@ -1,6 +1,6 @@
 use serde::{Deserialize, Serialize};
 
-use crate::timestamp::TimestampEnum;
+use crate::{preset::InAppPreset, timestamp::TimestampEnum};
 use derivative::Derivative;
 #[derive(Serialize, Deserialize, Derivative)]
 #[derivative(Default)]
@@ -22,4 +22,7 @@ pub struct Storage<'a> {
     pub autoconnect: bool,
     #[derivative(Default(value = "true"))]
     pub darkmode: bool,
+    pub preset_switch_1: Option<InAppPreset>,
+    pub preset_switch_2: Option<InAppPreset>,
+    pub preset_switch_time: u8,
 }
