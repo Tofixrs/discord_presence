@@ -39,5 +39,3 @@ mv Discord_Presence-x86_64.AppImage ../output/Discord_Presence-linux.AppImage
 cd ../
 rm -r temp
 unzip ./output/Windows-portable.zip
-cargo sweep -s
-cargo sweep -f
