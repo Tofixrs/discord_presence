@@ -155,10 +155,10 @@ impl MenuBar {
     }
 
     fn switcher(&mut self, ui: &mut Ui) {
-        ui.menu_button("Switcher", |ui| {
+        ui.menu_button("Switcher (Experimental!!)", |ui| {
             ui.hyperlink_to(
                 "Guide",
-                "https://tofix26.github.io/discord-presence-page/docs/guide/presets",
+                "https://tofix26.github.io/discord-presence-page/docs/guide/switcher",
             );
             ui.add_space(5.);
             let title = match &self.preset_switch_1 {
