@@ -1,5 +1,8 @@
 use chrono::{DateTime, TimeZone, Utc};
-use eframe::egui::{self, Color32, Context, Layout, RichText};
+use eframe::{
+    egui::{self, Color32, Context, Layout, RichText},
+    emath::Align,
+};
 
 #[derive(Default)]
 pub struct ErrorBar {
@@ -12,7 +15,7 @@ impl ErrorBar {
         if self.time_til_end.is_some() {
             if let Some(error) = &self.error {
                 egui::TopBottomPanel::bottom("error_bar").show(ctx, |ui| {
-                    ui.with_layout(Layout::right_to_left(), |ui| {
+                    ui.with_layout(Layout::right_to_left(Align::default()), |ui| {
                         ui.label(
                             RichText::new("Error: ".to_string() + error).color(Color32::LIGHT_RED),
                         );

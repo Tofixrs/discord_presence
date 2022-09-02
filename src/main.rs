@@ -38,6 +38,7 @@ fn main() {
         initial_window_size: Some(Vec2::new(600.0, 650.0)),
         resizable: false,
         vsync: true,
+        follow_system_theme: true,
         ..Default::default()
     };
     run_native(
@@ -110,6 +111,10 @@ impl App {
             None => "".to_string(),
             Some(value) => value,
         };
+        let default_theme = match storage.as_str() {
+            "" => true,
+            _ => false,
+        };
         let presets = match cc.storage.unwrap().get_string("presets") {
             None => "".to_string(),
             Some(value) => value,
@@ -118,10 +123,14 @@ impl App {
             Ok(storage) => storage,
             Err(_) => Storage::default(),
         };
-        match storage.darkmode {
-            true => cc.egui_ctx.set_visuals(egui::Visuals::dark()),
-            false => cc.egui_ctx.set_visuals(egui::Visuals::light()),
+
+        if !default_theme {
+            match storage.darkmode {
+                true => cc.egui_ctx.set_visuals(egui::Visuals::dark()),
+                false => cc.egui_ctx.set_visuals(egui::Visuals::light()),
+            }
         }
+
         let mut client =
             DiscordIpcClient::new(storage.id).expect("No reason for this  to failed either");
         let error = match storage.autoconnect {
